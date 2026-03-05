@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-calendar-alt"></i> Event Reports</h2>
+        <p class="text-muted">View detailed reports for all events across the platform.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list"></i> All Events</h5>
+                <button class="btn btn-sm btn-success" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Report
+                </button>
+            </div>
+            <div class="card-body">
+                {% if events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Leader</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Registrations</th>
+                                <th>Attendance</th>
+                                <th>Bags</th>
+                                <th>Recyclables</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td data-label="Event Name">{{ event.event_name }}</td>
+                                <td data-label="Leader">{{ event.leader_name }}</td>
+                                <td data-label="Date">{{ event.event_date.strftime('%d %b %Y') }}</td>
+                                <td data-label="Location">{{ event.location }}</td>
+                                <td data-label="Registrations" class="text-center">
+                                    <span class="badge bg-info">{{ event.total_registrations }}</span>
+                                </td>
+                                <td data-label="Attendance" class="text-center">
+                                    <span class="badge bg-success">{{ event.attended_count }}</span>
+                                    {% if event.total_registrations > 0 %}
+                                    <br><small>{{ (event.attended_count / event.total_registrations * 100)|int }}%</small>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Bags" class="text-center">{{ event.bags_collected or 0 }}</td>
+                                <td data-label="Recyclables" class="text-center">{{ event.recyclables_sorted or 0 }} kg</td>
+                                <td data-label="Rating">
+                                    {% if event.avg_rating %}
+                                    <div class="rating">
+                                        {{ "%.1f"|format(event.avg_rating) }}
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="4"><strong>Totals:</strong></td>
+                                <td class="text-center"><strong>{{ events|sum(attribute='total_registrations') }}</strong></td>
+                                <td class="text-center"><strong>{{ events|sum(attribute='attended_count') }}</strong></td>
+                                <td class="text-center"><strong>{{ events|sum(attribute='bags_collected') }}</strong></td>
+                                <td class="text-center"><strong>{{ events|sum(attribute='recyclables_sorted') }} kg</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No events found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Charts (Placeholder) -->
+<div class="row mt-4">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Events by Month</h5>
+            </div>
+            <div class="card-body text-center py-4">
+                <p class="text-muted">Monthly event distribution chart would appear here.</p>
+                <p>Coming soon with JavaScript integration.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Event Types</h5>
+            </div>
+            <div class="card-body text-center py-4">
+                <p class="text-muted">Event type distribution pie chart would appear here.</p>
+                <p>Coming soon with JavaScript integration.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-download"></i> Export Options</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4 mb-2">
+                        <button class="btn btn-outline-success w-100" onclick="alert('CSV export coming soon!')">
+                            <i class="fas fa-file-csv"></i> Export as CSV
+                        </button>
+                    </div>
+                    <div class="col-sm-4 mb-2">
+                        <button class="btn btn-outline-danger w-100" onclick="alert('PDF export coming soon!')">
+                            <i class="fas fa-file-pdf"></i> Export as PDF
+                        </button>
+                    </div>
+                    <div class="col-sm-4 mb-2">
+                        <button class="btn btn-outline-primary w-100" onclick="window.print()">
+                            <i class="fas fa-print"></i> Print Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

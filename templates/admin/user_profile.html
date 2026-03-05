@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('admin_users') }}">Users</a></li>
+                <li class="breadcrumb-item active">{{ user.full_name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User Info Card -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user-circle"></i> User Profile</h5>
+            </div>
+            <div class="card-body text-center">
+                <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}"
+                     alt="Profile Image"
+                     class="rounded-circle border border-3 border-primary mb-3 shadow-sm"
+                     style="width: 120px; height: 120px; object-fit: cover;">
+
+                <h4>{{ user.full_name }}</h4>
+                <p class="text-muted">@{{ user.username }}</p>
+
+                <p>
+                    <span class="badge
+                        {% if user.role == 'admin' %}bg-danger
+                        {% elif user.role == 'event_leader' %}bg-warning
+                        {% else %}bg-info{% endif %}">
+                        {{ user.role|replace('_', ' ')|title }}
+                    </span>
+
+                    <span class="badge {% if user.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                        {{ user.status }}
+                    </span>
+                </p>
+
+                <hr>
+
+                <div class="text-start">
+                    <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+                    <p><i class="fas fa-phone"></i> {{ user.contact_number }}</p>
+                    <p><i class="fas fa-home"></i> {{ user.home_address }}</p>
+                    <p><i class="fas fa-calendar-alt"></i> Joined: {{ user.registration_date.strftime('%d %b %Y') }}</p>
+                    <p><i class="fas fa-heart"></i> Interests: {{ user.environmental_interests }}</p>
+                </div>
+
+                <hr>
+
+                <!-- Status Change Form -->
+                <form method="POST" action="{{ url_for('admin_change_user_status', user_id=user.user_id) }}">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Change Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="active" {% if user.status == 'active' %}selected{% endif %}>Active</option>
+                            <option value="inactive" {% if user.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="fas fa-sync"></i> Update Status
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Activity History</h5>
+            </div>
+            <div class="card-body">
+                <h6>Event Registrations</h6>
+                {% if registrations %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reg in registrations %}
+                            <tr>
+                                <td>{{ reg.event_name }}</td>
+                                <td>{{ reg.event_date.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    <span class="badge {% if reg.status == 'registered' %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ reg.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if reg.attendance_status == 'attended' %}
+                                        <span class="badge bg-success">Attended</span>
+                                    {% elif reg.attendance_status == 'absent' %}
+                                        <span class="badge bg-danger">Absent</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No event registrations found.</p>
+                {% endif %}
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="border p-3 text-center rounded">
+                            <h3>{{ registrations|selectattr('attendance_status', 'equalto', 'attended')|list|length }}</h3>
+                            <span class="text-muted">Events Attended</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border p-3 text-center rounded">
+                            <h3>{{ registrations|selectattr('feedback_rating', 'defined')|selectattr('feedback_rating', 'ne', None)|list|length }}</h3>
+                            <span class="text-muted">Feedback Given</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col">
+        <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+</div>
+{% endblock %}

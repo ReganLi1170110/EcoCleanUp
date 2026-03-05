@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-tachometer-alt"></i> Volunteer Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ session.username }}! Here's your volunteer overview.</p>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-calendar-check fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ upcoming_events|length }}</div>
+            <div class="small opacity-75">Upcoming Events</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-history fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ past_events|length }}</div>
+            <div class="small opacity-75">Past Events</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-star fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ total_participated }}</div>
+            <div class="small opacity-75">Events Participated</div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Events -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Your Upcoming Events</h5>
+                <a href="{{ url_for('volunteer_events') }}" class="btn btn-sm btn-light">Browse All</a>
+            </div>
+            <div class="card-body">
+                {% if upcoming_events %}
+                <div class="list-group">
+                    {% for event in upcoming_events %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ event.event_name }}</h6>
+                            <small class="text-muted">{{ event.event_date.strftime('%d %b %Y') }}</small>
+                        </div>
+                        <p class="mb-1"><i class="fas fa-map-marker-alt text-success"></i> {{ event.location }}</p>
+                        <small class="text-muted">
+                            <i class="fas fa-clock"></i> {{ event.event_time.strftime('%I:%M %p') }} |
+                            <i class="fas fa-hourglass-half"></i> {{ event.duration }}
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('volunteer_event_detail', event_id=event.event_id) }}"
+                               class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">You have no upcoming events. <a href="{{ url_for('volunteer_events') }}">Browse events</a> to register!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Past Events with Summary -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Past Events</h5>
+                <a href="{{ url_for('volunteer_participation_history') }}" class="btn btn-sm btn-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if past_events %}
+                <div class="list-group">
+                    {% for event in past_events %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ event.event_name }}</h6>
+                            <small class="text-muted">{{ event.event_date.strftime('%d %b %Y') }}</small>
+                        </div>
+                        <p class="mb-1">
+                            <i class="fas fa-map-marker-alt text-success"></i> {{ event.location }}<br>
+                            <i class="fas fa-clock text-success"></i> {{ event.event_time.strftime('%I:%M %p') }}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <span class="badge {% if event.attendance_status == 'attended' %}bg-success{% elif event.attendance_status == 'absent' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                    {{ event.attendance_status|title }}
+                                </span>
+                                {% if event.feedback_rating %}
+                                <span class="badge bg-info ms-1">
+                                    <i class="fas fa-star"></i> {{ event.feedback_rating }}/5
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <a href="{{ url_for('volunteer_event_detail', event_id=event.event_id) }}"
+                                   class="btn btn-sm btn-outline-secondary">View</a>
+                                {% if not event.feedback_rating and event.attendance_status == 'attended' %}
+                                <a href="{{ url_for('volunteer_feedback', event_id=event.event_id) }}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-star"></i> Rate
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if event.feedback_comment %}
+                        <div class="mt-2 small text-muted border-top pt-2">
+                            <i class="fas fa-quote-left text-success"></i> {{ event.feedback_comment[:50] }}...
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">Please press "view all button" for details and rate history events </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Summary -->
+{% if past_events and past_events|selectattr('feedback_rating', 'defined')|list|length > 0 %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Your Recent Feedback</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for event in past_events %}
+                        {% if event.feedback_rating %}
+                        <div class="col-md-4 mb-3">
+                            <div class="border p-3 rounded h-100">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-2">{{ event.event_name }}</h6>
+                                    <span class="badge bg-success">{{ event.event_date.strftime('%d %b') }}</span>
+                                </div>
+                                <div class="rating mb-2">
+                                    {% for i in range(5) %}
+                                        {% if i < event.feedback_rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% if event.feedback_comment %}
+                                <p class="small text-muted mb-0">"{{ event.feedback_comment[:60] }}..."</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-4 mb-2">
+                        <a href="{{ url_for('volunteer_events') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search"></i> Browse Events
+                        </a>
+                    </div>
+                    <div class="col-sm-4 mb-2">
+                        <a href="{{ url_for('volunteer_participation_history') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-history"></i> My History
+                        </a>
+                    </div>
+                    <div class="col-sm-4 mb-2">
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-user-circle"></i> View Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Environmental Impact -->
+{% if total_participated > 0 %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-leaf"></i> Your Environmental Impact</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-center mb-0">Thank you for participating in {{ total_participated }} cleanup events!</p>
+                <p class="text-center text-muted small">Keep up the great work making our community cleaner and greener.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-success text-white py-5 mb-5">
+    <div class="container text-center">
+        <h1 class="display-1 fw-bold"><i class="fas fa-leaf"></i> EcoCleanUp Hub</h1>
+        <p class="lead">Join our community of environmental stewards. Together, we can make our planet cleaner and greener.</p>
+        {% if not session.user_id %}
+        <div>
+            <a href="{{ url_for('login') }}" class="btn btn-light btn-lg me-2">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-user-plus"></i> Register
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <h2 class="text-center mb-4">How It Works</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-4 text-center border-0 shadow-sm">
+                <i class="fas fa-search fa-3x text-success mb-3"></i>
+                <h3>Discover Events</h3>
+                <p class="text-muted">Browse and find local cleanup events that match your interests and availability.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-4 text-center border-0 shadow-sm">
+                <i class="fas fa-hands-helping fa-3x text-success mb-3"></i>
+                <h3>Join & Participate</h3>
+                <p class="text-muted">Register for events, track your participation, and make a real difference in your community.</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 p-4 text-center border-0 shadow-sm">
+                <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                <h3>Track Impact</h3>
+                <p class="text-muted">See the collective impact of our efforts through detailed reports and statistics.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- About Section -->
+<div class="container my-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h2>About GreenSteps Initiative</h2>
+            <p class="lead">Empowering communities through environmental action</p>
+            <p>GreenSteps Initiative is a fictional environmental organization dedicated to promoting community-driven sustainability efforts. Our mission is to connect volunteers with local cleanup events and provide tools for effective coordination and tracking.</p>
+            <p>Through the EcoCleanUp Hub, we aim to:</p>
+            <ul class="list-unstyled">
+                <li><i class="fas fa-check-circle text-success me-2"></i> Make cleanup events easily discoverable</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i> Streamline volunteer registration and coordination</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i> Track and showcase environmental impact</li>
+                <li><i class="fas fa-check-circle text-success me-2"></i> Build a stronger, greener community</li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                 class="img-fluid rounded shadow" alt="Community Cleanup">
+
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Counter -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-white bg-success p-4 text-center">
+                <i class="fas fa-calendar-check fa-3x mb-3 opacity-75"></i>
+                <div class="h2 fw-bold mb-1">20+</div>
+                <div class="small opacity-75">Events</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-white bg-success p-4 text-center">
+                <i class="fas fa-users fa-3x mb-3 opacity-75"></i>
+                <div class="h2 fw-bold mb-1">50+</div>
+                <div class="small opacity-75">Volunteers</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-white bg-success p-4 text-center">
+                <i class="fas fa-trash-alt fa-3x mb-3 opacity-75"></i>
+                <div class="h2 fw-bold mb-1">100+</div>
+                <div class="small opacity-75">Bags Collected</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-white bg-success p-4 text-center">
+                <i class="fas fa-recycle fa-3x mb-3 opacity-75"></i>
+                <div class="h2 fw-bold mb-1">200+</div>
+                <div class="small opacity-75">Recyclables</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="container my-5 text-center">
+    <div class="p-5 bg-light rounded-3">
+        <h3>Ready to Make a Difference?</h3>
+        <p class="lead">Join our community of environmental volunteers today!</p>
+        {% if not session.user_id %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-user-plus"></i> Register Now
+        </a>
+        {% else %}
+        <a href="{% if session.role == 'volunteer' %}{{ url_for('volunteer_dashboard') }}{% elif session.role == 'event_leader' %}{{ url_for('event_leader_dashboard') }}{% else %}{{ url_for('admin_dashboard') }}{% endif %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

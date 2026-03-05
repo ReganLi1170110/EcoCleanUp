@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Event</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('event_leader_edit_event', event_id=event.event_id) }}">
+                    <h5 class="text-success mb-3">Event Details</h5>
+                    
+                    <div class="mb-3">
+                        <label for="event_name" class="form-label">Event Name *</label>
+                        <input type="text" class="form-control" id="event_name" name="event_name" 
+                               value="{{ event.event_name }}" required>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="location" class="form-label">Location *</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   value="{{ event.location }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="event_type" class="form-label">Event Type</label>
+                            <input type="text" class="form-control" id="event_type" name="event_type" 
+                                   value="{{ event.event_type }}" readonly>
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-success mb-3 mt-4">Schedule</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="event_date" class="form-label">Event Date *</label>
+                            <input type="date" class="form-control" id="event_date" name="event_date" 
+                                   value="{{ event.event_date.strftime('%Y-%m-%d') }}" 
+                                   min="{{ now.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="event_time" class="form-label">Event Time *</label>
+                            <input type="time" class="form-control" id="event_time" name="event_time" 
+                                   value="{{ event.event_time.strftime('%H:%M') }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duration *</label>
+                        <input type="text" class="form-control" id="duration" name="duration" 
+                               value="{{ event.duration }}" required>
+                    </div>
+                    
+                    <h5 class="text-success mb-3 mt-4">Event Information</h5>
+                    
+                    <div class="mb-3">
+                        <label for="supplies" class="form-label">Supplies Provided *</label>
+                        <textarea class="form-control" id="supplies" name="supplies" rows="3" required>{{ event.supplies }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="safety_instructions" class="form-label">Safety Instructions *</label>
+                        <textarea class="form-control" id="safety_instructions" name="safety_instructions" rows="4" required>{{ event.safety_instructions }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Event Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="upcoming" {% if event.status == 'upcoming' %}selected{% endif %}>Upcoming</option>
+                            <option value="completed" {% if event.status == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="cancelled" {% if event.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('event_leader_manage_events') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Events
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

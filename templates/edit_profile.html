@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Profile</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_profile') }}" enctype="multipart/form-data">
+                    <!-- Personal Information -->
+                    <h5 class="text-success mb-3">Personal Information</h5>
+
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name"
+                               value="{{ user.full_name }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="home_address" class="form-label">Home Address *</label>
+                        <textarea class="form-control" id="home_address" name="home_address" rows="2" required>{{ user.home_address }}</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="contact_number" class="form-label">Contact Number *</label>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number"
+                                   value="{{ user.contact_number }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="environmental_interests" class="form-label">Environmental Interests *</label>
+                        <textarea class="form-control" id="environmental_interests" name="environmental_interests"
+                                  rows="3" required>{{ user.environmental_interests }}</textarea>
+                    </div>
+
+                    <!-- Profile Image -->
+                    <h5 class="text-success mb-3 mt-4">Profile Image</h5>
+
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}"
+                                 alt="Current Profile Image"
+                                 class="rounded-circle border border-3 border-primary mb-3 shadow-sm"
+                                  style="width: 120px; height: 120px; object-fit: cover;">
+                            <p class="small text-muted">Current Image</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="profile_image" class="form-label">Upload New Image</label>
+                                <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+                                <div class="form-text">Leave empty to keep current image. Max size: 16MB</div>
+                            </div>
+
+                            {% if user.profile_image != 'default_profile.png' %}
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeImage()">
+                                    <i class="fas fa-trash-alt"></i> Remove Current Image
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Account Information (Read-only) -->
+                    <h5 class="text-success mb-3 mt-4">Account Information</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="{{ user.username }}" readonly disabled>
+                            <div class="form-text">Username cannot be changed</div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" value="{{ user.email }}" readonly disabled>
+                            <div class="form-text">Contact admin to change email</div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form for removing image -->
+<form id="removeImageForm" method="POST" action="{{ url_for('remove_profile_image') }}" style="display: none;"></form>
+
+<script>
+function removeImage() {
+    if (confirm('Are you sure you want to remove your profile image? This will revert to the default image.')) {
+        document.getElementById('removeImageForm').submit();
+    }
+}
+</script>
+{% endblock %}

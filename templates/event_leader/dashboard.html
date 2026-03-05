@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-tachometer-alt"></i> Event Leader Dashboard</h2>
+        <p class="text-muted">Welcome back, {{ session.username }}! Manage your events and track volunteer participation.</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('event_leader_create_event') }}" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Create New Event
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-calendar-alt fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ stats.total_events if stats else 0 }}</div>
+            <div class="small opacity-75">Total Events</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-users fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ stats.total_registrations if stats else 0 }}</div>
+            <div class="small opacity-75">Total Registrations</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-trash-alt fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ stats.total_bags or 0 }}</div>
+            <div class="small opacity-75">Bags Collected</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-recycle fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ stats.total_recyclables or 0 }} kg</div>
+            <div class="small opacity-75">Recyclables</div>
+        </div>
+    </div>
+</div>
+
+<!-- Upcoming Events -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Your Upcoming Events</h5>
+                <a href="{{ url_for('event_leader_manage_events') }}" class="btn btn-sm btn-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if upcoming_events %}
+                <div class="list-group">
+                    {% for event in upcoming_events %}
+                    <div class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ event.event_name }}</h6>
+                            <small class="text-muted">{{ event.event_date.strftime('%d %b %Y') }}</small>
+                        </div>
+                        <p class="mb-1"><i class="fas fa-map-marker-alt text-success"></i> {{ event.location }}</p>
+                        <small class="text-muted">
+                            <i class="fas fa-users"></i> {{ event.registered_count }} registered
+                        </small>
+                        <div class="mt-2">
+                            <a href="{{ url_for('event_leader_event_volunteers', event_id=event.event_id) }}" 
+                               class="btn btn-sm btn-outline-primary">View Volunteers</a>
+                            <a href="{{ url_for('event_leader_track_attendance', event_id=event.event_id) }}" 
+                               class="btn btn-sm btn-outline-success">Track Attendance</a>
+                            <a href="{{ url_for('event_leader_edit_event', event_id=event.event_id) }}" 
+                               class="btn btn-sm btn-outline-secondary">Edit</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No upcoming events. <a href="{{ url_for('event_leader_create_event') }}">Create your first event</a>!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Completed Events -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Completed Events</h5>
+                <a href="{{ url_for('event_leader_manage_events') }}" class="btn btn-sm btn-light">View All</a>
+            </div>
+            <div class="card-body">
+                {% if past_events %}
+                <div class="list-group">
+                    {% for event in past_events %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ event.event_name }}</h6>
+                            <small class="text-muted">{{ event.event_date.strftime('%d %b %Y') }}</small>
+                        </div>
+                        <p class="mb-1">
+                            <i class="fas fa-users text-success"></i> {{ event.attended_count }} attended |
+                            <i class="fas fa-trash-alt text-success"></i> {{ event.bags_collected or 0 }} bags |
+                            <i class="fas fa-recycle text-success"></i> {{ event.recyclables_sorted or 0 }} kg
+                        </p>
+                        <div class="mt-2">
+                            <a href="{{ url_for('event_leader_record_outcomes', event_id=event.event_id) }}" 
+                               class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-chart-bar"></i> View/Edit Outcomes
+                            </a>
+                            <a href="{{ url_for('event_leader_event_volunteers', event_id=event.event_id) }}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-users"></i> View Volunteers
+                            </a>
+                            <a href="{{ url_for('event_leader_view_feedback') }}?event_id={{ event.event_id }}" 
+                               class="btn btn-sm btn-outline-warning">
+                                <i class="fas fa-star"></i> Feedback
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No completed events yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-3 mb-2">
+                        <a href="{{ url_for('event_leader_create_event') }}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-plus-circle"></i> Create Event
+                        </a>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <a href="{{ url_for('event_leader_manage_events') }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-tasks"></i> Manage Events
+                        </a>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <a href="{{ url_for('event_leader_participation_history') }}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-history"></i> Participation History
+                        </a>
+                    </div>
+                    <div class="col-sm-3 mb-2">
+                        <a href="{{ url_for('event_leader_view_feedback') }}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-star"></i> View Feedback
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Environmental Impact Summary -->
+{% if stats.total_bags or stats.total_recyclables %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-leaf"></i> Your Environmental Impact</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-6 mb-3">
+                        <div class="border p-3 rounded">
+                            <i class="fas fa-trash-alt fa-3x text-success mb-2"></i>
+                            <h3>{{ stats.total_bags or 0 }}</h3>
+                            <p class="text-muted mb-0">Total Bags of Rubbish Collected</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="border p-3 rounded">
+                            <i class="fas fa-recycle fa-3x text-success mb-2"></i>
+                            <h3>{{ stats.total_recyclables or 0 }} kg</h3>
+                            <p class="text-muted mb-0">Total Recyclables Sorted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

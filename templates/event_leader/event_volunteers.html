@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('event_leader_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('event_leader_manage_events') }}">Events</a></li>
+                <li class="breadcrumb-item active">{{ event.event_name }} - Volunteers</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="fas fa-users"></i> {{ event.event_name }}</h2>
+        <p class="text-muted">
+            <i class="fas fa-map-marker-alt"></i> {{ event.location }} | 
+            <i class="fas fa-calendar"></i> {{ event.event_date.strftime('%d %B %Y') }} at {{ event.event_time.strftime('%I:%M %p') }}
+        </p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{{ url_for('event_leader_track_attendance', event_id=event.event_id) }}" class="btn btn-success">
+            <i class="fas fa-check-circle"></i> Track Attendance
+        </a>
+        {% if event.event_date >= now.date() %}
+        <form method="POST" action="{{ url_for('event_leader_send_reminder', event_id=event.event_id) }}" style="display: inline;">
+            <button type="submit" class="btn btn-info text-white" onclick="return confirm('Send reminder to all registered volunteers? They will see it when they log in.')">
+                <i class="fas fa-bell"></i> Send Reminder
+            </button>
+        </form>
+        {% else %}
+        <button class="btn btn-secondary" disabled title="Cannot send reminders for past events">
+            <i class="fas fa-bell-slash"></i> Event Passed
+        </button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-clipboard-list"></i> Registered Volunteers ({{ volunteers|length }})</h5>
+                <span class="badge bg-light text-dark">{{ volunteers|length }} registered</span>
+            </div>
+            <div class="card-body">
+                {% if volunteers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Volunteer</th>
+                                <th>Contact</th>
+                                <th>Registration Date</th>
+                                <th>Status</th>
+                                <th>Attendance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for volunteer in volunteers %}
+                            <tr>
+                                <td data-label="Volunteer">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-circle fa-2x me-2 text-success"></i>
+                                        <div>
+                                            <strong>{{ volunteer.full_name }}</strong><br>
+                                            <small class="text-muted">@{{ volunteer.username }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Contact">
+                                    <i class="fas fa-envelope"></i> {{ volunteer.email }}<br>
+                                    <i class="fas fa-phone"></i> {{ volunteer.contact_number }}
+                                </td>
+                                <td data-label="Registration Date">{{ volunteer.registration_date.strftime('%d %b %Y') }}</td>
+                                <td data-label="Status">
+                                    {% if volunteer.status == 'registered' %}
+                                        <span class="badge bg-success">Registered</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">{{ volunteer.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Attendance">
+                                    {% if volunteer.attendance_status == 'attended' %}
+                                        <span class="badge bg-success">Attended</span>
+                                    {% elif volunteer.attendance_status == 'absent' %}
+                                        <span class="badge bg-danger">Absent</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Actions">
+                                    {% if volunteer.status == 'registered' and event.event_date >= now.date() %}
+                                    <form method="POST" action="{{ url_for('event_leader_remove_volunteer', event_id=event.event_id, user_id=volunteer.user_id) }}"
+                                          onsubmit="return confirm('Remove {{ volunteer.full_name }} from this event?')">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-user-minus"></i> Remove
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-users fa-4x text-muted mb-3"></i>
+                    <p class="lead">No volunteers registered yet</p>
+                    <p class="text-muted">Share the event link to get volunteers signed up!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-chart-simple"></i> Registration Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border p-3 text-center rounded">
+                            <h3>{{ volunteers|length }}</h3>
+                            <span class="text-muted">Total Registered</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border p-3 text-center rounded">
+                            <h3>{{ volunteers|selectattr('attendance_status', 'equalto', 'attended')|list|length }}</h3>
+                            <span class="text-muted">Attended</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border p-3 text-center rounded">
+                            <h3>{{ volunteers|selectattr('attendance_status', 'equalto', 'absent')|list|length }}</h3>
+                            <span class="text-muted">Absent</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="border p-3 text-center rounded">
+                            <h3>{{ volunteers|selectattr('attendance_status', 'equalto', 'pending')|list|length }}</h3>
+                            <span class="text-muted">Pending</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col">
+        <a href="{{ url_for('event_leader_manage_events') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Events
+        </a>
+    </div>
+</div>
+{% endblock %}

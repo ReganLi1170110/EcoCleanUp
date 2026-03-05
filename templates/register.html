@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-user-plus"></i> Register as Volunteer</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('register') }}" enctype="multipart/form-data">
+                    <!-- Account Information -->
+                    <h5 class="text-success mb-3">Account Information</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="username" class="form-label">Username *</label>
+                            <input type="text" class="form-control" id="username" name="username" 
+                                   value="{{ form_data.username if form_data }}" required>
+                            <div class="form-text">Unique username - cannot be changed later</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ form_data.email if form_data }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="password" class="form-label">Password *</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="form-text">
+                                At least 8 characters with uppercase, lowercase, and number
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="confirm_password" class="form-label">Confirm Password *</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Information -->
+                    <h5 class="text-success mb-3 mt-4">Personal Information</h5>
+                    
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" 
+                               value="{{ form_data.full_name if form_data }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="home_address" class="form-label">Home Address *</label>
+                        <textarea class="form-control" id="home_address" name="home_address" rows="2" required>{{ form_data.home_address if form_data }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="contact_number" class="form-label">Contact Number *</label>
+                            <input type="text" class="form-control" id="contact_number" name="contact_number" 
+                                   value="{{ form_data.contact_number if form_data }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="profile_image" class="form-label">Profile Image (Optional)</label>
+                            <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*">
+                            <div class="form-text">Leave empty to use default image</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="environmental_interests" class="form-label">Environmental Interests *</label>
+                        <textarea class="form-control" id="environmental_interests" name="environmental_interests" 
+                                  rows="3" placeholder="e.g., beach cleanups, recycling, tree planting, river conservation" 
+                                  required>{{ form_data.environmental_interests if form_data }}</textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        All new accounts are registered as volunteers. Event leader and admin accounts are created separately by the system administrator.
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus"></i> Register
+                        </button>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary">
+                            Already have an account? Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

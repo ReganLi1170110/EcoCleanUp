@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Create New Cleanup Event</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('event_leader_create_event') }}">
+                    <!-- Basic Information -->
+                    <h5 class="text-success mb-3">Event Details</h5>
+                    
+                    <div class="mb-3">
+                        <label for="event_name" class="form-label">Event Name *</label>
+                        <input type="text" class="form-control" id="event_name" name="event_name" required>
+                        <div class="form-text">Choose a descriptive name for your cleanup event</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="event_type" class="form-label">Event Type *</label>
+                            <select class="form-select" id="event_type" name="event_type" required>
+                                <option value="">Select type</option>
+                                <option value="beach">Beach Cleanup</option>
+                                <option value="river">River Cleanup</option>
+                                <option value="park">Park Cleanup</option>
+                                <option value="forest">Forest Cleanup</option>
+                                <option value="recycling">Recycling Drive</option>
+                                <option value="garden">Community Garden</option>
+                                <option value="education">Educational Event</option>
+                                <option value="general">General Cleanup</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="location" class="form-label">Location *</label>
+                            <input type="text" class="form-control" id="location" name="location" 
+                                   placeholder="e.g., Sunset Beach, Coastal Town" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Date and Time -->
+                    <h5 class="text-success mb-3 mt-4">Schedule</h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="event_date" class="form-label">Event Date *</label>
+                            <input type="date" class="form-control" id="event_date" name="event_date" 
+                                   min="{{ now.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="event_time" class="form-label">Event Time *</label>
+                            <input type="time" class="form-control" id="event_time" name="event_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duration *</label>
+                        <input type="text" class="form-control" id="duration" name="duration" 
+                               placeholder="e.g., 3 hours" required>
+                    </div>
+                    
+                    <!-- Event Details -->
+                    <h5 class="text-success mb-3 mt-4">Event Information</h5>
+                    
+                    <div class="mb-3">
+                        <label for="supplies" class="form-label">Supplies Provided *</label>
+                        <textarea class="form-control" id="supplies" name="supplies" rows="3" 
+                                  placeholder="List all supplies that will be provided (gloves, bags, tools, etc.)" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="safety_instructions" class="form-label">Safety Instructions *</label>
+                        <textarea class="form-control" id="safety_instructions" name="safety_instructions" rows="4" 
+                                  placeholder="Provide important safety information for volunteers" required></textarea>
+                        <div class="form-text">Include information about appropriate clothing, hazards, emergency procedures, etc.</div>
+                    </div>
+                    
+                    <!-- Additional Options -->
+                    <div class="mb-3">
+                        <label class="form-label">Additional Options</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="send_reminder" name="send_reminder">
+                            <label class="form-check-label" for="send_reminder">
+                                Send reminder to volunteers (1 week before event)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="allow_feedback" name="allow_feedback" checked>
+                            <label class="form-check-label" for="allow_feedback">
+                                Allow volunteers to submit feedback after event
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        After creating the event, you can manage volunteer registrations, track attendance, and record outcomes.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('event_leader_dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check-circle"></i> Create Event
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

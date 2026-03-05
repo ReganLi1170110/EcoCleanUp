@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-history"></i> My Participation History</h2>
+        <p class="text-muted">Track all the events you've participated in and your contributions.</p>
+    </div>
+</div>
+
+<!-- Summary Statistics -->
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-calendar-check fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ participations|selectattr('attendance_status', 'equalto', 'attended')|list|length }}</div>
+            <div class="small opacity-75">Events Attended</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-star fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">
+                {% set feedback_count = participations|selectattr('feedback_rating', 'defined')|selectattr('feedback_rating', 'ne', None)|list|length %}
+                {{ feedback_count }}
+            </div>
+            <div class="small opacity-75">Feedback Given</div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-chart-line fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ participations|length }}</div>
+            <div class="small opacity-75">Total Registrations</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-check"></i> All Events</h5>
+                <span class="badge bg-light text-dark">{{ participations|length }} events</span>
+            </div>
+            <div class="card-body">
+                {% if participations %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Attendance</th>
+                                <th>My Rating & Comment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for participation in participations %}
+                            <tr>
+                                <td data-label="Event Name">
+                                    <strong>{{ participation.event_name }}</strong>
+                                </td>
+                                <td data-label="Date">{{ participation.event_date.strftime('%d %b %Y') }}</td>
+                                <td data-label="Location">{{ participation.location }}</td>
+                                <td data-label="Attendance">
+                                    {% if participation.attendance_status == 'attended' %}
+                                        <span class="badge bg-success">✓ Attended</span>
+                                    {% elif participation.attendance_status == 'absent' %}
+                                        <span class="badge bg-danger">✗ Absent</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">⏳ Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="My Rating & Comment">
+                                    {% if participation.feedback_rating %}
+                                        <div class="rating mb-1">
+                                            {% for i in range(5) %}
+                                                {% if i < participation.feedback_rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-warning"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            <small class="text-muted ms-2">
+                                                {{ participation.feedback_date.strftime('%d/%m/%Y') }}
+                                            </small>
+                                        </div>
+                                        {% if participation.feedback_comment %}
+                                            <div class="small text-muted bg-light p-2 rounded mt-1">
+                                                <i class="fas fa-quote-left text-success"></i> 
+                                                "{{ participation.feedback_comment }}"
+                                            </div>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted fst-italic">No rating yet</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Actions">
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('volunteer_event_detail', event_id=participation.event_id) }}" 
+                                           class="btn btn-outline-secondary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        
+                                        {% if participation.attendance_status == 'attended' and not participation.feedback_rating %}
+                                            <a href="{{ url_for('volunteer_feedback', event_id=participation.event_id) }}" 
+                                               class="btn btn-success">
+                                                <i class="fas fa-star"></i> Rate
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-alt fa-4x text-muted mb-3"></i>
+                    <p class="lead">No participation history yet</p>
+                    <p class="text-muted">Join your first cleanup event to start building your history!</p>
+                    <a href="{{ url_for('volunteer_events') }}" class="btn btn-success">
+                        <i class="fas fa-search"></i> Browse Events
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

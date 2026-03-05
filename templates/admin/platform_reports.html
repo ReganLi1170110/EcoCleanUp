@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-chart-pie"></i> Platform Reports</h2>
+        <p class="text-muted">View platform-wide statistics and analytics.</p>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-calendar-alt fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ total_events }}</div>
+            <div class="small opacity-75">Total Events</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-users fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ total_volunteers }}</div>
+            <div class="small opacity-75">Volunteers</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-user-tie fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ total_event_leaders }}</div>
+            <div class="small opacity-75">Event Leaders</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6 mb-3">
+        <div class="card text-white bg-success p-4 text-center">
+            <i class="fas fa-star fa-3x mb-3 opacity-75"></i>
+            <div class="h2 fw-bold mb-1">{{ "%.1f"|format(feedback_stats.avg_rating) if feedback_stats.avg_rating else 0 }}</div>
+            <div class="small opacity-75">Avg Rating</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Feedback Statistics -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-star"></i> Feedback Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h3>{{ feedback_stats.total_feedback or 0 }}</h3>
+                        <span class="text-muted">Total Feedback</span>
+                    </div>
+                    <div class="col-4">
+                        <h3>{{ "%.1f"|format(feedback_stats.avg_rating) if feedback_stats.avg_rating else 0 }}</h3>
+                        <span class="text-muted">Average Rating</span>
+                    </div>
+                    <div class="col-4">
+                        <h3>{{ feedback_stats.users_with_feedback or 0 }}</h3>
+                        <span class="text-muted">Active Reviewers</span>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>Rating Distribution</h6>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between">
+                        <span>5 Stars</span>
+                        <span class="badge bg-success">Coming soon</span>
+                    </div>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Monthly Statistics -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Monthly Activity</h5>
+            </div>
+            <div class="card-body">
+                {% if monthly_stats %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Events</th>
+                                <th>Bags Collected</th>
+                                <th>Recyclables (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in monthly_stats %}
+                            <tr>
+                                <td>{{ stat.month }}/{{ stat.year }}</td>
+                                <td>{{ stat.event_count }}</td>
+                                <td>{{ stat.total_bags or 0 }}</td>
+                                <td>{{ stat.total_recyclables or 0 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No monthly data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Volunteers -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-trophy"></i> Top Volunteers</h5>
+            </div>
+            <div class="card-body">
+                {% if top_volunteers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Volunteer</th>
+                                <th>Events Participated</th>
+                                <th>Feedback Given</th>
+                                <th>Average Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for volunteer in top_volunteers %}
+                            <tr>
+                                <td>#{{ loop.index }}</td>
+                                <td>
+                                    <strong>{{ volunteer.full_name }}</strong>
+                                    <br><small class="text-muted">@{{ volunteer.username }}</small>
+                                </td>
+                                <td>{{ volunteer.events_participated }}</td>
+                                <td>{{ volunteer.feedback_given }}</td>
+                                <td>
+                                    {% if volunteer.avg_rating %}
+                                    <div class="rating">
+                                        {{ "%.1f"|format(volunteer.avg_rating) }}
+                                        <i class="fas fa-star text-warning"></i>
+                                    </div>
+                                    {% else %}
+                                    N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No volunteer data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

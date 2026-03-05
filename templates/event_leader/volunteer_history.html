@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('event_leader_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('event_leader_participation_history') }}">Participation History</a></li>
+                <li class="breadcrumb-item active">{{ volunteer.full_name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-user-circle"></i> Volunteer Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-user-circle fa-5x text-success"></i>
+                </div>
+                <h4 class="text-center">{{ volunteer.full_name }}</h4>
+                <p class="text-center text-muted">@{{ volunteer.username }}</p>
+                <hr>
+                <p><i class="fas fa-envelope text-success"></i> {{ volunteer.email }}</p>
+                <p><i class="fas fa-phone text-success"></i> {{ volunteer.contact_number or 'Not provided' }}</p>
+                <p><i class="fas fa-heart text-success"></i> {{ volunteer.environmental_interests or 'No interests specified' }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-success p-3 text-center">
+                    <div class="h3 mb-0">{{ total_events }}</div>
+                    <small>Total Events</small>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-success p-3 text-center">
+                    <div class="h3 mb-0">{{ attended_events }}</div>
+                    <small>Events Attended</small>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card text-white bg-success p-3 text-center">
+                    <div class="h3 mb-0">{{ "%.1f"|format(avg_rating) }}</div>
+                    <small>Average Rating</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Event History</h5>
+            </div>
+            <div class="card-body">
+                {% if events %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Attendance</th>
+                                <th>Rating</th>
+                                <th>Feedback</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td data-label="Event Name">
+                                    <a href="{{ url_for('event_leader_event_volunteers', event_id=event.event_id) }}">
+                                        {{ event.event_name }}
+                                    </a>
+                                </td>
+                                <td data-label="Date">{{ event.event_date.strftime('%d %b %Y') }}</td>
+                                <td data-label="Location">{{ event.location }}</td>
+                                <td data-label="Attendance">
+                                    {% if event.attendance_status == 'attended' %}
+                                        <span class="badge bg-success">Attended</span>
+                                    {% elif event.attendance_status == 'absent' %}
+                                        <span class="badge bg-danger">Absent</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Rating">
+                                    {% if event.feedback_rating %}
+                                        <div class="rating">
+                                            {% for i in range(5) %}
+                                                {% if i < event.feedback_rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-warning"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">Not rated</span>
+                                    {% endif %}
+                                </td>
+                                <td data-label="Feedback">
+                                    {% if event.feedback_comment %}
+                                        <button type="button" class="btn btn-sm btn-outline-info" 
+                                                onclick="showFeedback('{{ event.event_name }}', '{{ event.feedback_comment }}', {{ event.feedback_rating }})">
+                                            <i class="fas fa-comment"></i> View
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted">No comment</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No events found for this volunteer.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-comment"></i> Volunteer Feedback
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6 id="feedbackEventName" class="fw-bold mb-3"></h6>
+                <div id="feedbackRating" class="rating mb-3"></div>
+                <p id="feedbackComment" class="mb-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showFeedback(eventName, comment, rating) {
+    document.getElementById('feedbackEventName').textContent = eventName;
+    document.getElementById('feedbackComment').textContent = comment;
+    
+    // Generate stars
+    let stars = '';
+    for (let i = 0; i < 5; i++) {
+        if (i < rating) {
+            stars += '<i class="fas fa-star text-warning"></i>';
+        } else {
+            stars += '<i class="far fa-star text-warning"></i>';
+        }
+    }
+    document.getElementById('feedbackRating').innerHTML = stars;
+    
+    // Show modal
+    var modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+    modal.show();
+}
+</script>
+{% endblock %}

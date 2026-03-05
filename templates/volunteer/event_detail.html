@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('volunteer_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('volunteer_events') }}">Events</a></li>
+                <li class="breadcrumb-item active">{{ event.event_name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Event Details -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-calendar-alt"></i> {{ event.event_name }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-success"><i class="fas fa-map-marker-alt"></i> Location</h6>
+                        <p>{{ event.location }}</p>
+                        
+                        <h6 class="text-success"><i class="fas fa-calendar"></i> Date & Time</h6>
+                        <p>{{ event.event_date.strftime('%A, %d %B %Y') }} at {{ event.event_time.strftime('%I:%M %p') }}</p>
+                        
+                        <h6 class="text-success"><i class="fas fa-hourglass-half"></i> Duration</h6>
+                        <p>{{ event.duration }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-success"><i class="fas fa-tag"></i> Event Type</h6>
+                        <p><span class="badge bg-info">{{ event.event_type|title }}</span></p>
+                        
+                        <h6 class="text-success"><i class="fas fa-users"></i> Registered Volunteers</h6>
+                        <p>{{ event.registered_count }} participants</p>
+                        
+                        <h6 class="text-success"><i class="fas fa-user-tie"></i> Event Leader</h6>
+                        <p>{{ event.leader_name }}</p>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-success"><i class="fas fa-box"></i> Supplies Provided</h6>
+                    <p>{{ event.supplies }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-success"><i class="fas fa-shield-alt"></i> Safety Instructions</h6>
+                    <p>{{ event.safety_instructions }}</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-success"><i class="fas fa-info-circle"></i> Event Status</h6>
+                    <p>
+                        {% if event.status == 'upcoming' %}
+                            <span class="badge bg-info">Upcoming</span>
+                        {% elif event.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% elif event.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </p>
+                </div>
+                
+                {% if event.is_registered %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        You are registered for this event. Status: 
+                        <strong>{{ event.registration_status|title }}</strong>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Registration Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-clipboard-check"></i> Registration</h5>
+            </div>
+            <div class="card-body">
+                {% if event.status == 'cancelled' %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        This event has been cancelled.
+                    </div>
+                {% elif event.event_date < now.date() %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-clock"></i>
+                        This event has already passed.
+                    </div>
+                {% elif event.is_registered %}
+                    <p class="text-success">
+                        <i class="fas fa-check-circle"></i> You are registered for this event.
+                    </p>
+                    
+                    {% if event.registration_status == 'registered' %}
+                        <form method="POST" action="{{ url_for('volunteer_register_event', event_id=event.event_id) }}" 
+                              onsubmit="return confirm('Are you sure you want to cancel your registration?')">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <button type="submit" class="btn btn-danger w-100">
+                                <i class="fas fa-times"></i> Cancel Registration
+                            </button>
+                        </form>
+                    {% endif %}
+                {% else %}
+                    <p class="text-muted">Ready to join this cleanup event?</p>
+                    
+                    <form method="POST" action="{{ url_for('volunteer_register_event', event_id=event.event_id) }}"
+                          onsubmit="return confirm('Register for {{ event.event_name }}?')">
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="fas fa-check"></i> Register Now
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <p class="small text-muted mt-3">
+                        <i class="fas fa-info-circle"></i>
+                        By registering, you agree to follow safety instructions and participate responsibly.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Additional Info Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb"></i> Tips for Participants</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Wear comfortable, weather-appropriate clothing</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Bring a reusable water bottle</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Arrive 10-15 minutes early</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Follow event leader instructions</li>
+                    <li><i class="fas fa-check-circle text-success me-2"></i> Take photos and share your experience!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col">
+        <a href="{{ url_for('volunteer_events') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Events
+        </a>
+    </div>
+</div>
+{% endblock %}

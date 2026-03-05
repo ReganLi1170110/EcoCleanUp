@@ -1,0 +1,139 @@
+/* EcoCleanUp Hub - Custom Styles
+   Only overrides Bootstrap default colors
+   All layouts and positioning come from Bootstrap classes
+*/
+
+:root {
+    --primary-green: #2e7d32;
+    --primary-dark: #1b5e20;
+    --primary-light: #4caf50;
+    --secondary-gold: #ff8f00;
+    --text-dark: #263238;
+    --bg-light: #f5f5f5;
+    
+    /* Override Bootstrap primary color */
+    --bs-primary: var(--primary-green);
+    --bs-primary-rgb: 46, 125, 50;
+    --bs-success: var(--primary-green);
+    --bs-info: #0288d1;
+    --bs-warning: var(--secondary-gold);
+    --bs-danger: #d32f2f;
+}
+
+/* Override Bootstrap button colors */
+.btn-primary {
+    --bs-btn-bg: var(--primary-green);
+    --bs-btn-border-color: var(--primary-green);
+    --bs-btn-hover-bg: var(--primary-dark);
+    --bs-btn-hover-border-color: var(--primary-dark);
+    --bs-btn-active-bg: var(--primary-dark);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--primary-green);
+    --bs-btn-border-color: var(--primary-green);
+    --bs-btn-hover-bg: var(--primary-green);
+    --bs-btn-hover-border-color: var(--primary-green);
+}
+
+.btn-success {
+    --bs-btn-bg: var(--primary-green);
+    --bs-btn-border-color: var(--primary-green);
+    --bs-btn-hover-bg: var(--primary-dark);
+}
+
+/* Override Bootstrap background and text colors */
+.bg-primary {
+    background-color: var(--primary-green) !important;
+}
+
+.bg-success {
+    background-color: var(--primary-green) !important;
+}
+
+.text-primary {
+    color: var(--primary-green) !important;
+}
+
+.border-primary {
+    border-color: var(--primary-green) !important;
+}
+
+/* Navbar brand color */
+.navbar-brand {
+    color: var(--primary-green) !important;
+    font-weight: 700;
+}
+
+/* Links */
+a {
+    color: var(--primary-green);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+/* Card headers - use Bootstrap bg-primary class instead of custom */
+.card-header.bg-primary {
+    background-color: var(--primary-green) !important;
+}
+
+/* Dashboard stats cards - use Bootstrap card + bg-success classes */
+.card.text-white.bg-success {
+    background-color: var(--primary-green) !important;
+}
+
+/* Footer - already uses bg-dark, just need text color */
+.footer.bg-dark {
+    background-color: #2c3e50 !important;
+}
+
+/* Alert colors */
+.alert-success {
+    --bs-alert-color: var(--primary-dark);
+    --bs-alert-bg: #e8f5e8;
+    --bs-alert-border-color: var(--primary-light);
+}
+
+/* Badge colors */
+.badge.bg-success {
+    background-color: var(--primary-green) !important;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-green) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--secondary-gold) !important;
+}
+
+/* Rating stars */
+.rating .fas.fa-star {
+    color: var(--secondary-gold);
+}
+
+/* Form focus */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+}
+
+/* Table header */
+.table thead th {
+    background-color: var(--primary-green) !important;
+    color: white;
+}
+
+/* Pagination */
+.page-link {
+    color: var(--primary-green);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}

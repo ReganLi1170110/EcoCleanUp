@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('event_leader_dashboard') }}">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('event_leader_manage_events') }}">Events</a></li>
+                <li class="breadcrumb-item active">{{ event.event_name }} - Track Attendance</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-check-circle"></i> Track Attendance</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Event:</strong> {{ event.event_name }}<br>
+                    <strong>Date:</strong> {{ event.event_date.strftime('%d %B %Y') }}<br>
+                    <strong>Time:</strong> {{ event.event_time.strftime('%I:%M %p') }}
+                </div>
+                
+                <form method="POST" action="{{ url_for('event_leader_track_attendance', event_id=event.event_id) }}">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Volunteer Name</th>
+                                    <th>Current Status</th>
+                                    <th>Mark Attendance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for volunteer in volunteers %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ volunteer.full_name }}</strong>
+                                        <br><small class="text-muted">@{{ volunteer.username }}</small>
+                                    </td>
+                                    <td>
+                                        {% if volunteer.attendance_status == 'attended' %}
+                                            <span class="badge bg-success">Attended</span>
+                                        {% elif volunteer.attendance_status == 'absent' %}
+                                            <span class="badge bg-danger">Absent</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Not Marked</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" name="attendance_{{ volunteer.user_id }}" 
+                                                   id="attended_{{ volunteer.user_id }}" value="attended"
+                                                   {% if volunteer.attendance_status == 'attended' %}checked{% endif %}>
+                                            <label class="btn btn-outline-success btn-sm" for="attended_{{ volunteer.user_id }}">
+                                                <i class="fas fa-check"></i> Attended
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="attendance_{{ volunteer.user_id }}" 
+                                                   id="absent_{{ volunteer.user_id }}" value="absent"
+                                                   {% if volunteer.attendance_status == 'absent' %}checked{% endif %}>
+                                            <label class="btn btn-outline-danger btn-sm" for="absent_{{ volunteer.user_id }}">
+                                                <i class="fas fa-times"></i> Absent
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="attendance_{{ volunteer.user_id }}" 
+                                                   id="pending_{{ volunteer.user_id }}" value="pending"
+                                                   {% if volunteer.attendance_status == 'pending' or not volunteer.attendance_status %}checked{% endif %}>
+                                            <label class="btn btn-outline-warning btn-sm" for="pending_{{ volunteer.user_id }}">
+                                                <i class="fas fa-clock"></i> Pending
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Marking attendance will update volunteer participation records.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('event_leader_event_volunteers', event_id=event.event_id) }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Attendance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

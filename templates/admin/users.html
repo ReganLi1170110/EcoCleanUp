@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="fas fa-users-cog"></i> User Management</h2>
+        <p class="text-muted">View, search, and manage all platform users.</p>
+    </div>
+</div>
+
+<!-- Filter Section -->
+<div class="filter-section">
+    <form method="GET" action="{{ url_for('admin_users') }}" class="row g-3">
+        <div class="col-md-4">
+            <label for="search" class="form-label">Search</label>
+            <input type="text" class="form-control" id="search" name="search" 
+                   placeholder="Username, name, or email" value="{{ current_filters.search }}">
+        </div>
+        
+        <div class="col-md-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" id="role" name="role">
+                <option value="">All Roles</option>
+                <option value="volunteer" {% if current_filters.role == 'volunteer' %}selected{% endif %}>Volunteer</option>
+                <option value="event_leader" {% if current_filters.role == 'event_leader' %}selected{% endif %}>Event Leader</option>
+                <option value="admin" {% if current_filters.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        
+        <div class="col-md-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+                <option value="">All Status</option>
+                <option value="active" {% if current_filters.status == 'active' %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if current_filters.status == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+        
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list"></i> All Users ({{ users|length }})</h5>
+            </div>
+            <div class="card-body">
+                {% if users %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td data-label="Username">@{{ user.username }}</td>
+                                <td data-label="Full Name">{{ user.full_name }}</td>
+                                <td data-label="Email">{{ user.email }}</td>
+                                <td data-label="Role">
+                                    <span class="badge 
+                                        {% if user.role == 'admin' %}bg-danger
+                                        {% elif user.role == 'event_leader' %}bg-warning
+                                        {% else %}bg-info{% endif %}">
+                                        {{ user.role|replace('_', ' ')|title }}
+                                    </span>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="badge {% if user.status == 'active' %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {{ user.status }}
+                                    </span>
+                                </td>
+                                <td data-label="Joined">{{ user.registration_date.strftime('%d %b %Y') }}</td>
+                                <td data-label="Actions">
+                                    <a href="{{ url_for('admin_user_profile', user_id=user.user_id) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted mb-0">No users found matching your criteria.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
