@@ -31,8 +31,35 @@ Unsplash. (2021). *Community cleanup volunteers* [Photograph].https://images.uns
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+# System overview 
+EcoCleanUp Hub is a web-based platform designed to streamline the organization and coordination of community cleanup events. The system connects volunteers with local environmental initiatives, providing tools for event discovery, registration, participation tracking, and impact measurement.
 
+### Key Features
 
+**For Volunteers:**
+- Browse and filter upcoming cleanup events by date, location, and event type
+- Register for events with automatic scheduling conflict detection
+- View personal participation history with attendance status
+- Submit feedback with star ratings (1-5) and comments for attended events
+- Receive pop-up reminders on login for upcoming registered events
+
+**For Event Leaders:**
+- Create new cleanup events with all required details (name, location, date, time, duration, supplies, safety instructions)
+- Manage existing events (edit details, cancel events)
+- View and manage registered volunteers for each event
+- Track volunteer attendance during events
+- Record event outcomes including bags collected and recyclables sorted
+- View volunteer participation history across all managed events
+- Send reminder notifications to volunteers for upcoming events
+- Review all feedback submitted by volunteers
+
+**For Administrators:**
+- View all users with search and filter capabilities (by name, role, status)
+- Activate or deactivate user accounts
+- Access platform-wide statistics including total events, volunteers, feedback submissions, and average ratings
+- Generate comprehensive event reports with attendance and engagement data
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 # EcoCleanUp Hub - Deployment Instructions
 
