@@ -109,7 +109,7 @@ export PGPASSWORD='#_=MT@EGS9ralW0d'
 psql -h lincolnmac-5080.postgres.pythonanywhere-services.com -p 15080 -U regan_li -d regan_li_ecu -f /home/Reganli1170110/EcoCleanUp/create_database.sql
 psql -h lincolnmac-5080.postgres.pythonanywhere-services.com -p 15080 -U regan_li -d regan_li_ecu -f /home/Reganli1170110/EcoCleanUp/populate_database.sql
 
-5. Password Hashing Implementation
+5. **Password Hashing**
 Technology Used
 Flask-Bcrypt - Flask extension for bcrypt password hashing
 
@@ -122,16 +122,10 @@ Login Verification
 During login, the provided password is checked against the stored hash:
 if bcrypt.check_password_hash(stored_hash, entered_password):
 
-Password Change
 When changing passwords, the new password is hashed and stored.
-
-Security Features
 No plain text passwords - Only bcrypt hashes are stored
-
 Unique salts - Each password gets a unique salt
-
 Same password = different hashes - Due to unique salts
-
 60-character hashes - Standard bcrypt format
 
 
