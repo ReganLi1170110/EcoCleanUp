@@ -110,15 +110,11 @@ psql -h lincolnmac-5080.postgres.pythonanywhere-services.com -p 15080 -U regan_l
 psql -h lincolnmac-5080.postgres.pythonanywhere-services.com -p 15080 -U regan_li -d regan_li_ecu -f /home/Reganli1170110/EcoCleanUp/populate_database.sql
 
 5. **Password Hashing**
-Technology Used
 Flask-Bcrypt - Flask extension for bcrypt password hashing
 
-How It Works
-Registration
 When a user registers, their password is hashed before storage:
 password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-Login Verification
 During login, the provided password is checked against the stored hash:
 if bcrypt.check_password_hash(stored_hash, entered_password):
 
